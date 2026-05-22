@@ -697,7 +697,7 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
                                         <label class="field-label" for="log-date">
                                             Tarikh <span class="field-required">*</span>
                                         </label>
-                                        <input type="date" id="log-date" name="log_date" class="input-base" value="{{ date('Y-m-d') }}" required />
+                                        <input type="date" id="log-date" name="log_date" class="input-base" value="{{ date('Y-m-d') }}" required onchange="checkExistingLog()" />
                                     </div>
                                 </div>
 
@@ -772,8 +772,9 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
                                 </div>
 
                                 <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
-                                    <button type="submit" class="btn-lime">
+                                    <button type="submit" id="submit-btn" class="btn-lime">
                                         💾 Simpan
+                                    </button>
                                     </button>
                                     <button type="button" id="generateBtn" class="btn-sky" onclick="generateWithAI()">
                                         🤖 Siapkan guna AI
@@ -819,7 +820,7 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
                         </div>
 
                         @forelse($recentLogs as $log)
-                        <div class="log-item">
+                        <a href="{{ route('dashboard') }}?edit={{ $log->log_date->format('Y-m-d') }}" class="log-item" style="text-decoration:none;color:inherit;display:block;">
                             <div class="log-day-badge">D{{ $log->log_day }}</div>
                             <div class="log-divider"></div>
                             <div style="flex:1;min-width:0;">
@@ -827,7 +828,7 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
                                 <div class="log-date">{{ $log->log_date->format('d/m/Y') }}</div>
                             </div>
                             <div class="log-status">✓ {{ ucfirst($log->log_status) }}</div>
-                        </div>
+                        </a>
                         @empty
                         <div class="log-item">
                             <div class="log-summary">Belum ada log. Mula tulis entri pertama anda!</div>
@@ -849,6 +850,105 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
     </div>
 
     <script>
+        const existingLogDates = @json($existingLogDates ?? []);
+        let currentEditingLogId = null;
+
+        // Check for edit parameter on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const editDate = params.get('edit');
+            if (editDate && existingLogDates.includes(editDate)) {
+                const dateInput = document.getElementById('log-date');
+                dateInput.value = editDate;
+                checkExistingLog();
+            }
+        });
+
+        function checkExistingLog() {
+            const dateInput = document.getElementById('log-date');
+            const selectedDate = dateInput.value;
+            
+            if (existingLogDates.includes(selectedDate)) {
+                fetch(`/logs/${selectedDate}/edit`, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.log) {
+                        const log = data.log;
+                        currentEditingLogId = log.log_id;
+                        
+                        document.getElementById('day-number').value = log.log_day;
+                        document.getElementById('log-location').value = log.log_location || '';
+                        document.getElementById('log-place').value = log.log_place || '';
+                        document.getElementById('activities').value = log.log_summary || '';
+                        document.getElementById('log-knowledge').value = log.log_knowledge || '';
+                        document.getElementById('log-tools').value = log.log_tools || '';
+                        document.getElementById('log-note').value = log.log_note || '';
+                        
+                        countChars(document.getElementById('activities'), 'act-count', 800);
+                        
+                        const submitBtn = document.getElementById('submit-btn');
+                        submitBtn.textContent = '✏️ Kemaskini';
+                        submitBtn.onclick = function() { updateLog(selectedDate); };
+                        
+                        const form = document.getElementById('logForm');
+                        form.action = '#';
+                        form.dataset.editing = 'true';
+                    }
+                });
+            } else {
+                resetToNewEntry();
+            }
+        }
+
+        function resetToNewEntry() {
+            currentEditingLogId = null;
+            const form = document.getElementById('logForm');
+            form.action = '{{ route("logs.store") }}';
+            form.dataset.editing = 'false';
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = '💾 Simpan';
+            submitBtn.onclick = null;
+            delete submitBtn.onclick;
+        }
+
+        function updateLog(dateStr) {
+            const formData = new FormData();
+            formData.append('log_day', document.getElementById('day-number').value);
+            formData.append('log_summary', document.getElementById('activities').value);
+            formData.append('log_location', document.getElementById('log-location').value);
+            formData.append('log_place', document.getElementById('log-place').value);
+            formData.append('log_knowledge', document.getElementById('log-knowledge').value);
+            formData.append('log_tools', document.getElementById('log-tools').value);
+            formData.append('log_note', document.getElementById('log-note').value);
+            
+            fetch(`/logs/${dateStr}`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Log berjaya dikemaskini!');
+                    window.location.reload();
+                } else {
+                    alert('Ralat: ' + (data.error || 'Gagal mengemaskini log'));
+                }
+            })
+            .catch(err => {
+                alert('Ralat: ' + err.message);
+            });
+        }
+
         let sidebarOpen = window.innerWidth >= 769;
 
         function toggleSidebar() {

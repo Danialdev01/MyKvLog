@@ -768,13 +768,17 @@ $defaultSettings = $user->defaults;
                                 $dayPadded = str_pad($day, 2, '0', STR_PAD_LEFT);
                                 $monthPadded = str_pad($currentMonth, 2, '0', STR_PAD_LEFT);
                                 $dateStr = "{$currentYear}-{$monthPadded}-{$dayPadded}";
-                                $hasLog = in_array($dateStr, $logDates ?? []);
+                                $hasLog = isset($logDates) && in_array($dateStr, $logDates);
                                 $isToday = $dateStr === $todayDate;
                                 $logEntry = $logsByDate[$dateStr] ?? null;
                                 @endphp
                                 <div class="cal-day{{ $hasLog ? ' has-log' : '' }}{{ $isToday ? ' today' : '' }}"
-                                     {{ $hasLog && $logEntry ? "data-log-id=\"{$logEntry->log_id}\" data-date=\"{$dateStr}\" onclick=\"openLogModal(this)\"" : '' }}
-                                     title="{{ $hasLog ? 'Entri log wujud' : 'Tiada entri' }}">
+                                    @if($hasLog && $logEntry)
+                                    data-log-id="{{ $logEntry->log_id }}"
+                                    data-date="{{ $dateStr }}"
+                                    onclick="openLogModal('{{ $logEntry->log_id }}', '{{ $dateStr }}')"
+                                    @endif
+                                    title="{{ $hasLog ? 'Entri log wujud' : 'Tiada entri' }}">
                                     <span class="day-num">{{ $day }}</span>
                                     <span class="log-indicator"></span>
                                 </div>
@@ -852,15 +856,15 @@ $defaultSettings = $user->defaults;
         let currentLogId = null;
         let currentLogDate = null;
 
-        function openLogModal(el) {
-            currentLogId = el.dataset.logId;
-            currentLogDate = el.dataset.date;
-            const dayNum = currentLogDate.split('-')[2].replace(/^0/, '');
+        function openLogModal(logId, dateStr) {
+            currentLogId = logId;
+            currentLogDate = dateStr;
+            const dayNum = dateStr.split('-')[2].replace(/^0/, '');
             document.getElementById('logModalTitle').textContent = `Log Hari #${dayNum}`;
             document.getElementById('logModalBody').innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">Memuatkan...</div>';
             document.getElementById('logModalOverlay').classList.add('active');
 
-            fetch(`/logs/${currentLogId}`, {
+            fetch(`/logs/${logId}`, {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     'Accept': 'application/json',

@@ -23,6 +23,7 @@ class AIController extends Controller
             'log_day' => ['required', 'integer', 'min:1', 'max:365'],
             'log_location' => ['nullable', 'string'],
             'log_place' => ['nullable', 'string'],
+            'job_scope' => ['nullable', 'string'],
             'log_summary' => ['nullable', 'string'],
             'log_knowledge' => ['nullable', 'string'],
             'log_tools' => ['nullable', 'string'],
@@ -120,7 +121,7 @@ protected function buildFieldPrompt(string $field, array $data): string
 
             'log_knowledge' => "Anda adalah penulis log latihan industri profesional. Tulis dalam Bahasa Melayu SAHAJA. {$refText}Aktiviti yang dilakukan: '{$summary}'. Berbasiskan aktiviti tersebut, tulis 2-4 KLAUSA dalam Bahasa Melayu yang grammatik betul tentang pengetahuan dan kemahiran yang diperolehi atau dipertingkatkan. Fokus pada apa yang ANDA pelajari, bukan pada aktiviti itu sendiri. Konteks: Hari {$day}, jabatan: {$location}, skop kerja: {$jobScope}. Tulis dalam bahasa pertama, tense lampau. Contoh output: 'Saya telah belajar cara menggunakan Figma untuk mereka bentuk wireframe.', 'Kemahiran pensuisan dan kabel saya telah bertambah baik.', 'Saya memahami proses pengurusan fail dalam sistem berasaskan web.' Pastikan tiada ralat grammatik. Pastikan output adalah 2-4 klausa dalam SATU perenggan SAHAJA. Tulis sekarang:",
 
-            'log_tools' => "Anda adalah penulis log latihan industri profesional. Tulis dalam Bahasa Melayu SAHAJA. {$refText}Berdasarkan aktiviti: '{$summary}' dan alat sedia ada: '{$tools}'. Senaraikan alat dan peralatan yang digunakan semasa latihan industri dalam Bahasa Melayu yang grammatik betul. PRIORITIKAN aktiviti pengguna. Konteks: Hari {$day}, jabatan: {$location}, skop kerja: {$jobScope}. Senaraikan sebagai nilai terpisah koma SAHAJA, contoh: 'Komputer, Internet, Google Chrome, Microsoft Word'. Maksimum 6 item. Pastikan tiada ralat grammatik. Balas hanya dengan senarai alat sahaja:",
+            'log_tools' => "Analisis aktiviti: '{$summary}' dan pembelajaran: '{$knowledge}'. Berdasarkan skop kerja: '{$jobScope}'. Senaraikan ALAT dan PERALATAN yang digunakan sebagai SENARAI DIPISAHKAN KOMA SAHAJA. Contoh: Komputer,Internet,Visual Studio Code,Git,Google Chrome,Microsoft Word. Maksimum 6 item. Tulis sekarang:",
 
             'log_note' => "Anda adalah penulis log latihan industri profesional. Tulis dalam Bahasa Melayu SAHAJA. {$refText}Aktiviti hari ini: '{$summary}'. Pengetahuan yang diperolehi: '{$knowledge}'. Tulis 1-2 KLAUSA dalam Bahasa Melayu yang grammatik betul tentang nota tambahan, pemerhatian peribadi, atau rumusan pengalaman hari ini. Konteks: Hari {$day}, jabatan: {$location}. Fokus pada pemerhatian peribadi seperti kesukaran yang dihadapi, cara mengatasi masalah, atau nasihat untuk hari hadapan. Tulis dalam bahasa pertama, tense lampau. Pastikan tiada ralat grammatik. Pastikan output adalah 1-2 klausa dalam SATU perenggan SAHAJA. Tulis sekarang:",
         ];

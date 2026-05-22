@@ -159,4 +159,36 @@ class LogController extends Controller
             'today' => date('d/m/Y'),
         ]);
     }
+
+    public function update(Request $request, $date)
+    {
+        $log = Log::where('log_date', $date)->where('user_id', auth()->id())->first();
+
+        if (!$log) {
+            return response()->json(['success' => false, 'error' => 'Log not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'log_day' => ['required', 'integer', 'min:1', 'max:365'],
+            'log_summary' => ['required', 'string'],
+            'log_location' => ['nullable', 'string', 'max:255'],
+            'log_place' => ['nullable', 'string', 'max:255'],
+            'log_knowledge' => ['nullable', 'string'],
+            'log_tools' => ['nullable', 'string'],
+            'log_note' => ['nullable', 'string'],
+        ]);
+
+        $log->update([
+            'log_day' => $validated['log_day'],
+            'log_summary' => $validated['log_summary'],
+            'log_location' => $validated['log_location'] ?? null,
+            'log_place' => $validated['log_place'] ?? null,
+            'log_knowledge' => $validated['log_knowledge'] ?? null,
+            'log_tools' => $validated['log_tools'] ?? null,
+            'log_note' => $validated['log_note'] ?? null,
+            'log_updated_at' => now(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Log updated successfully', 'log_id' => $log->log_id]);
+    }
 }

@@ -21,7 +21,9 @@ Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+    $logDates = $user->logs()->pluck('log_date')->map(fn($d) => $d->format('Y-m-d'))->toArray();
+    return view('dashboard', ['existingLogDates' => $logDates]);
 })->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -36,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logs', [LogController::class, 'store'])->name('logs.store');
     Route::get('/logs/{id}', [LogController::class, 'show'])->name('logs.show');
     Route::get('/logs/{date}/edit', [LogController::class, 'edit'])->name('logs.edit');
+    Route::put('/logs/{date}', [LogController::class, 'update'])->name('logs.update');
     Route::get('/logs/print/{date}', [LogController::class, 'printByDate'])->name('logs.printByDate');
     Route::post('/ai/generate', [AIController::class, 'generate'])->name('ai.generate');
     Route::post('/ai/generate-field', [AIController::class, 'generateField'])->name('ai.generate-field');
