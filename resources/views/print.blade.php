@@ -217,6 +217,13 @@
             <h1 class="page-title">🖨️ Cetak Log</h1>
             <p class="page-subtitle">Sedia untuk mencetak log latihan industri anda</p>
 
+            {{-- Tunjuk mesej error kalau ada (contoh: tiada log dalam julat tarikh) --}}
+            @if(session('error'))
+                <div style="background:#FEE2E2; border:1px solid #FCA5A5; border-radius:10px; padding:12px 16px; margin-bottom:20px; color:#DC2626; font-size:0.85rem; font-weight:600;">
+                    ⚠️ {{ session('error') }}
+                </div>
+            @endif
+
             <div class="print-options-card">
                 <div class="print-options-title">Pilihan Cetakan</div>
 
@@ -246,7 +253,19 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" class="btn-orange" onclick="alert('Funzioni cetak belum disediakan')">🖨️ Cetak Log</button>
+                    {{--
+                        target="_blank" = buka dalam tab baru.
+                        PDF akan dipapar sebagai preview dalam tab baru (inline),
+                        user boleh download dari toolbar PDF browser kalau nak.
+                    --}}
+                    <form method="POST" action="{{ route('logs.pdf') }}" id="pdfForm" target="_blank">
+                        @csrf
+                        {{-- Input tersembunyi untuk hantar pilihan user ke controller --}}
+                        <input type="hidden" name="print_type" id="hidden_print_type" value="all">
+                        <input type="hidden" name="start_date" id="hidden_start_date" value="">
+                        <input type="hidden" name="end_date" id="hidden_end_date" value="">
+                        <button type="submit" class="btn-orange" onclick="preparePdfForm(event)">🖨️ Preview & Muat Turun PDF</button>
+                    </form>
                 </div>
             </div>
 
@@ -287,7 +306,7 @@
                                     <td class="log-summary">{{ $log->log_summary }}</td>
                                     <td class="log-date">{{ $log->log_date->format('d/m/Y') }}</td>
                                     <td><span class="log-status">{{ $log->log_status }}</span></td>
-                                    <td><button type="button" class="print-page-btn" onclick="alert('Funzioni cetak belum disediakan')">🖨️ Cetak</button></td>
+                                    <td><a href="{{ route('logs.pdf.single', $log->log_id) }}" class="print-page-btn" target="_blank">🖨️ Cetak</a></td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -332,6 +351,30 @@
             const printType = document.querySelector('input[name="print_type"]:checked').value;
             const dateRangeInputs = document.getElementById('dateRangeInputs');
             dateRangeInputs.classList.toggle('visible', printType === 'range');
+        }
+
+        // Fungsi ini akan copy nilai dari form pilihan user
+        // ke hidden inputs dalam form PDF sebelum submit
+        function preparePdfForm(event) {
+            const printType = document.querySelector('input[name="print_type"]:checked').value;
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            // Kalau pilih julat tarikh tapi tak isi tarikh, tunjuk mesej
+            if (printType === 'range') {
+                if (!startDate || !endDate) {
+                    event.preventDefault();
+                    alert('Sila isi tarikh mula dan tarikh akhir terlebih dahulu.');
+                    return;
+                }
+            }
+
+            // Copy nilai ke hidden inputs dalam form
+            document.getElementById('hidden_print_type').value = printType;
+            document.getElementById('hidden_start_date').value = startDate;
+            document.getElementById('hidden_end_date').value = endDate;
+
+            // Biarkan form submit seperti biasa
         }
 
         function filterLogs() {
