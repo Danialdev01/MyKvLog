@@ -839,15 +839,19 @@ $year = date('Y');
                     @csrf
                     <div class="form-group">
                         <label>Nama Penuh</label>
-                        <input type="text" name="name" placeholder="Nama penuh anda" required />
+                        <input type="text" name="name" placeholder="Nama penuh anda" required value="{{ old('name') }}" />
                     </div>
                     <div class="form-group">
                         <label>Alamat Emel</label>
-                        <input type="email" name="email" placeholder="anda@contoh.com" required />
+                        <input type="email" name="email" placeholder="anda@contoh.com" required value="{{ old('email') }}" />
                     </div>
                     <div class="form-group">
                         <label>Kata Laluan</label>
                         <input type="password" name="password" placeholder="Buat kata laluan" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Sahkan Kata Laluan</label>
+                        <input type="password" name="password_confirmation" placeholder="Sahkan kata laluan anda" required />
                     </div>
                     <button type="submit" class="btn-submit">Buat Akaun</button>
                 </form>
@@ -900,12 +904,12 @@ $year = date('Y');
             if (e.key === 'Escape') closeModal();
         });
 
-        @if(session('google_email_exists') || session('google_already_logged_in') || session('google_error'))
+        @if(session('google_email_exists') || session('google_already_logged_in') || session('google_error') || session('register_error'))
             window.addEventListener('load', function() {
                 let icon = '⚠️';
                 let title = 'Emel Sudah Daftar';
                 let message = 'Emel ini sudah daftar dengan kata laluan. Sila daftar masuk dengan emel dan kata laluan instead.';
-                let detail = `{{ session('google_error_detail') }}`;
+                let detail = @json(session('google_error_detail') ?: session('register_error_detail'));
 
                 @if(session('google_already_logged_in'))
                     icon = 'ℹ️';
@@ -914,7 +918,11 @@ $year = date('Y');
                 @elseif(session('google_error'))
                     icon = '❌';
                     title = 'Ralat Google';
-                    message = '{{ session('google_error') }}';
+                    message = @json(session('google_error'));
+                @elseif(session('register_error'))
+                    icon = '❌';
+                    title = 'Ralat Pendaftaran';
+                    message = @json(session('register_error'));
                 @endif
 
                 const detailHtml = detail

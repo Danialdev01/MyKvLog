@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -20,32 +21,48 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,user_email'],
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,user_email'],
+                'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            ]);
 
-        $user = User::create([
-            'user_email' => $validated['email'],
-            'user_hash_password' => Hash::make($validated['password']),
-            'user_status' => 'active',
-            'user_created_at' => now(),
-        ]);
+            $user = User::create([
+                'user_email' => $validated['email'],
+                'user_hash_password' => Hash::make($validated['password']),
+                'user_type_login' => 'email',
+                'user_status' => 'active',
+                'user_created_at' => now(),
+            ]);
 
-        $user->defaults()->create([
-            'default_internship_period' => 90,
-            'default_department' => 'Latihan Industri',
-            'default_company' => '',
-            'default_job_scope' => '',
-            'default_status' => 'active',
-            'default_created_at' => now(),
-        ]);
+            $user->defaults()->create([
+                'default_internship_period' => 90,
+                'default_department' => 'Latihan Industri',
+                'default_company' => '',
+                'default_job_scope' => '',
+                'default_status' => 'active',
+                'default_created_at' => now(),
+            ]);
 
-        event(new Registered($user));
+            event(new Registered($user));
 
-        Auth::login($user);
+            Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+            return redirect(route('dashboard', absolute: false));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error('Register Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('home')->with([
+                'register_error' => 'Pendaftaran gagal. Sila cuba lagi.',
+                'register_error_detail' => $e->getMessage() . ' (file: ' . basename($e->getFile()) . ':' . $e->getLine() . ')',
+            ]);
+        }
     }
 }
