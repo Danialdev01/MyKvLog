@@ -59,8 +59,15 @@ class RegisteredUserController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
+            $errorMessage = match(true) {
+                str_contains($e->getMessage(), 'caching_sha2_password') || str_contains($e->getMessage(), '[2054]')
+                    => 'Pangkalan data tidak serasi dengan pelayan aplikasi. Sila hubungi pentadbir sistem untuk tukar kaedah auth MySQL.',
+                str_contains($e->getMessage(), 'SQLSTATE') => 'Ralat pangkalan data berlaku. Sila hubungi pentadbir sistem.',
+                default => 'Pendaftaran gagal. Sila cuba lagi.'
+            };
+
             return redirect()->route('home')->with([
-                'register_error' => 'Pendaftaran gagal. Sila cuba lagi.',
+                'register_error' => $errorMessage,
                 'register_error_detail' => $e->getMessage() . ' (file: ' . basename($e->getFile()) . ':' . $e->getLine() . ')',
             ]);
         }

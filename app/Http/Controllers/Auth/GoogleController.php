@@ -76,12 +76,15 @@ class GoogleController extends Controller
 
             return redirect()->route('dashboard');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Google SSO Error: ' . $e->getMessage());
 
             $errorMessage = match(true) {
                 str_contains($e->getMessage(), 'invalid_grant') => 'Sesi Google sudah tamat. Sila cuba lagi.',
                 str_contains($e->getMessage(), 'Malformed') => 'Kod Google tidak sah. Sila cuba lagi.',
+                str_contains($e->getMessage(), 'caching_sha2_password') || str_contains($e->getMessage(), '[2054]')
+                    => 'Pangkalan data tidak serasi dengan pelayan aplikasi. Sila hubungi pentadbir sistem untuk tukar kaedah auth MySQL.',
+                str_contains($e->getMessage(), 'SQLSTATE') => 'Ralat pangkalan data berlaku. Sila hubungi pentadbir sistem.',
                 default => 'Gagal log masuk dengan Google. Sila cuba lagi.'
             };
 
