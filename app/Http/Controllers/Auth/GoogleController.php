@@ -24,7 +24,10 @@ class GoogleController extends Controller
         try {
             if (Auth::check()) {
                 Log::info('Google SSO - User already logged in');
-                return redirect()->route('dashboard')->with('google_already_logged_in', true);
+                return redirect()->route('dashboard')->with([
+                    'google_already_logged_in' => true,
+                    'google_error_detail' => 'User ID: ' . Auth::id() . ' (sudah login) - Sesi: ' . session()->getId(),
+                ]);
             }
 
             $googleUser = Socialite::driver('google')->user();
@@ -41,7 +44,10 @@ class GoogleController extends Controller
 
             if ($user && $user->user_type_login !== 'google') {
                 Log::info('Google SSO - Email exists with different login type');
-                return redirect()->route('home')->with('google_email_exists', true);
+                return redirect()->route('home')->with([
+                    'google_email_exists' => true,
+                    'google_error_detail' => 'Email wujud dengan jenis login: ' . $user->user_type_login . ' (user_id: ' . $user->user_id . ')',
+                ]);
             }
 
             if (!$user) {
@@ -79,7 +85,10 @@ class GoogleController extends Controller
                 default => 'Gagal log masuk dengan Google. Sila cuba lagi.'
             };
 
-            return redirect()->route('home')->with(['google_error' => $errorMessage]);
+            return redirect()->route('home')->with([
+                'google_error' => $errorMessage,
+                'google_error_detail' => $e->getMessage(),
+            ]);
         }
     }
 }

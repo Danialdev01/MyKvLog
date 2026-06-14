@@ -905,6 +905,7 @@ $year = date('Y');
                 let icon = '⚠️';
                 let title = 'Emel Sudah Daftar';
                 let message = 'Emel ini sudah daftar dengan kata laluan. Sila daftar masuk dengan emel dan kata laluan instead.';
+                let detail = `{{ session('google_error_detail') }}`;
 
                 @if(session('google_already_logged_in'))
                     icon = 'ℹ️';
@@ -916,9 +917,13 @@ $year = date('Y');
                     message = '{{ session('google_error') }}';
                 @endif
 
+                const detailHtml = detail
+                    ? '<div style="margin-top:-8px;margin-bottom:16px;padding:8px 10px;background:#F3F4F6;border-radius:6px;font-family:monospace;font-size:0.7rem;color:#374151;word-break:break-word;text-align:left;max-height:120px;overflow-y:auto;white-space:pre-wrap;">🔍 ' + detail + '</div>'
+                    : '';
+
                 const msgModal = document.createElement('div');
                 msgModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;';
-                msgModal.innerHTML = '<div style="background:white;border-radius:20px;padding:2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.15);"><div style="font-size:3rem;margin-bottom:12px;">' + icon + '</div><h3 style="font-size:1.2rem;font-weight:800;color:#1F2937;margin-bottom:8px;">' + title + '</h3><p style="color:#6B7280;font-size:0.9rem;margin-bottom:20px;">' + message + '</p><button onclick="this.parentElement.parentElement.remove();document.body.style.overflow=\'\'" style="background:#FF6B35;color:white;border:none;border-radius:10px;padding:12px 24px;font-weight:700;cursor:pointer;">Okay</button></div>';
+                msgModal.innerHTML = '<div style="background:white;border-radius:20px;padding:2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.15);"><div style="font-size:3rem;margin-bottom:12px;">' + icon + '</div><h3 style="font-size:1.2rem;font-weight:800;color:#1F2937;margin-bottom:8px;">' + title + '</h3><p style="color:#6B7280;font-size:0.9rem;margin-bottom:20px;">' + message + '</p>' + detailHtml + '<button onclick="this.parentElement.parentElement.remove();document.body.style.overflow=\'\'" style="background:#FF6B35;color:white;border:none;border-radius:10px;padding:12px 24px;font-weight:700;cursor:pointer;">Okay</button></div>';
                 document.body.appendChild(msgModal);
                 document.body.style.overflow = 'hidden';
             });
