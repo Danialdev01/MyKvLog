@@ -4,6 +4,7 @@ use App\Http\Controllers\AIController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/logs/{date}/edit', [LogController::class, 'edit'])->name('logs.edit');
     Route::put('/logs/{date}', [LogController::class, 'update'])->name('logs.update');
     Route::get('/logs/print/{date}', [LogController::class, 'printByDate'])->name('logs.printByDate');
+    Route::post('/logs/pdf', [PdfController::class, 'generatePdf'])->name('logs.pdf');
+    Route::get('/logs/pdf/{id}', [PdfController::class, 'generatePdfSingle'])->name('logs.pdf.single');
     Route::post('/ai/generate', [AIController::class, 'generate'])->name('ai.generate');
     Route::post('/ai/generate-field', [AIController::class, 'generateField'])->name('ai.generate-field');
     Route::get('/print', [LogController::class, 'print'])->middleware(['auth'])->name('print');

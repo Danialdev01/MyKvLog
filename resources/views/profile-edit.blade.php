@@ -204,7 +204,7 @@ $defaultSettings = $user->defaults;
                     </div>
                 </div>
 
-                <form id="passwordForm" method="POST" action="{{ route('password.update') }}">
+                <form id="passwordForm" method="POST" action="/password">
                     @csrf
                     @method('PUT')
                     <div id="passwordError" class="status-message error"></div>
@@ -240,7 +240,7 @@ $defaultSettings = $user->defaults;
                     </div>
                 </div>
 
-                <form id="defaultsForm" method="POST" action="{{ route('profile.defaults') }}">
+                <form id="defaultsForm" method="POST" action="/profile/defaults">
                     @csrf
                     <div id="defaultsError" class="status-message error"></div>
 

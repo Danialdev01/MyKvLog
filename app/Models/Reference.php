@@ -13,7 +13,8 @@ class Reference extends Model
     protected $primaryKey = 'reference_id';
     public $timestamps = false;
 
-    #[Fillable(['log_id', 'reference_file', 'reference_image', 'reference_diagram', 'reference_created_at', 'reference_status'])]
+    protected $fillable = ['log_id', 'reference_file', 'reference_image', 'reference_diagram', 'reference_created_at', 'reference_status'];
+
     protected $casts = [
         'reference_created_at' => 'datetime',
     ];

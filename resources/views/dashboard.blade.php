@@ -681,7 +681,7 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
                             </div>
                         </div>
                         <div class="form-card-body">
-                            <form id="logForm" method="POST" action="{{ route('logs.store') }}" enctype="multipart/form-data">
+                            <form id="logForm" method="POST" action="/logs" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-grid" style="margin-bottom:20px;">
                                     <div>
