@@ -1,3 +1,7 @@
+# GD is bundled in php84's default extension list via nixpkgs 24.11
+# pkgs/development/interpreters/php/8.4.nix (base.withExtensions includes gd).
+# Do not try to add php84Packages.gd — that flat attribute does not exist in this
+# nixpkgs version and the Nix evaluation will fail with 'attribute gd missing'.
 [phases.setup]
 nixPkgs = ["php84", "php84Packages.composer", "nodejs_20"]
 
