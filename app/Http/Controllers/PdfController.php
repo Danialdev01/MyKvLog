@@ -99,12 +99,13 @@ class PdfController extends Controller
      * Loop semua log dan convert setiap gambar kepada base64 JPEG.
      *
      * Kenapa JPEG? DomPDF boleh embed JPEG TANPA perlukan PHP GD extension.
-     * PNG pula memerlukan GD — sebab tu ada error tadi.
+     * PNG pula memerlukan GD.
      *
      * Strategi:
+     * - Baca gambar dari S3 (tempat upload sebenar), fallback ke disk public untuk fail lama
      * - Kalau gambar memang JPEG/JPG → baca terus, convert ke base64 (tak perlu GD)
      * - Kalau gambar PNG/GIF/lain → cuba convert ke JPEG guna GD kalau ada
-     * - Kalau GD takde dan gambar bukan JPEG → skip (image_base64 = null)
+     * - Kalau gagal → image_base64 = null, image_error simpan sebab untuk view
      */
     private function tambahBase64Gambar($logs)
     {
@@ -114,17 +115,20 @@ class PdfController extends Controller
         foreach ($logs as $log) {
             foreach ($log->references as $ref) {
 
-                // Semak fail ada dalam storage
-                if (!Storage::disk('public')->exists($ref->reference_image)) {
+                $fileContent = $this->bacaGambar($ref->reference_image);
+
+                if ($fileContent === null) {
+                    \Log::warning('PDF: reference image not found in storage', [
+                        'reference_id' => $ref->getKey(),
+                        'path'         => $ref->reference_image,
+                    ]);
                     $ref->image_base64 = null;
-                    continue; // skip ke gambar seterusnya
+                    $ref->image_error  = 'missing';
+                    continue;
                 }
 
-                // Dapatkan jenis MIME gambar (jpeg, png, gif, dll)
-                $mimeType = Storage::disk('public')->mimeType($ref->reference_image);
-
-                // Baca kandungan fail gambar dari storage
-                $fileContent = Storage::disk('public')->get($ref->reference_image);
+                // Kesan jenis MIME dari kandungan fail sendiri (bukan extension nama fail)
+                $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($fileContent) ?: 'unknown';
 
                 // ===== KES 1: Gambar sudah JPEG — boleh guna terus =====
                 // DomPDF boleh proses JPEG tanpa GD extension
@@ -137,6 +141,10 @@ class PdfController extends Controller
                 if ($gdAda) {
                     // GD ada — convert gambar kepada JPEG dalam memory
                     $ref->image_base64 = $this->convertKeJpegBase64($fileContent, $mimeType);
+                    if ($ref->image_base64 === null) {
+                        $ref->image_error = 'convert';
+                        $ref->image_mime  = $mimeType;
+                    }
                 } else {
                     // GD takde — log untuk ops, dan biar view tunjuk mesej ringkas
                     \Log::warning('GD extension missing — cannot embed image in PDF', [
@@ -144,12 +152,34 @@ class PdfController extends Controller
                         'mime'         => $mimeType,
                     ]);
                     $ref->image_base64 = null;
+                    $ref->image_error  = 'gd';
                     $ref->image_mime   = $mimeType; // simpan mime untuk tunjuk mesej berguna
                 }
             }
         }
 
         return $logs;
+    }
+
+    /**
+     * Baca kandungan gambar dari storage.
+     * Upload baru disimpan dalam S3 (lihat LogController::store),
+     * tapi fail lama mungkin masih dalam disk public — cuba kedua-duanya.
+     */
+    private function bacaGambar(string $path): ?string
+    {
+        foreach (['s3', 'public'] as $disk) {
+            try {
+                $content = Storage::disk($disk)->get($path);
+                if ($content !== null && $content !== '') {
+                    return $content;
+                }
+            } catch (\Throwable $e) {
+                // Disk tak boleh dicapai (cth. credential S3 salah) — cuba disk seterusnya
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -250,12 +250,19 @@
                                     <img src="{{ $ref->image_base64 }}" alt="Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }}">
                                     <div class="gambar-label">Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }}</div>
 
-                                {{-- KES 2: Gambar tidak dapat diproses (format disokong tapi server tiada GD) --}}
+                                {{-- KES 2: Gambar tidak dapat diproses — papar sebab sebenar --}}
                                 @else
                                     <div class="gambar-warning">
-                                        [Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }} tidak dapat dipaparkan
-                                        ({{ $ref->image_mime ?? 'format tidak disokong' }}).
-                                        Hubungi admin untuk enable PHP GD extension.]
+                                        @if(($ref->image_error ?? null) === 'missing')
+                                            [Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }} tidak dijumpai dalam storan.]
+                                        @elseif(($ref->image_error ?? null) === 'gd')
+                                            [Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }} tidak dapat dipaparkan
+                                            ({{ $ref->image_mime ?? 'format tidak dikenali' }}).
+                                            Hubungi admin untuk enable PHP GD extension.]
+                                        @else
+                                            [Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }} tidak dapat diproses
+                                            ({{ $ref->image_mime ?? 'format tidak dikenali' }}).]
+                                        @endif
                                     </div>
                                 @endif
 

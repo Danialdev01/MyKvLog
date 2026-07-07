@@ -1008,15 +1008,46 @@ $completionPercent = min(100, round(($totalLogs / $internshipPeriod) * 100));
 
         function handleFiles(files) {
             Array.from(files).forEach(file => {
-                if (uploadedFiles.length >= 10) return;
                 if (!file.type.startsWith('image/')) return;
                 if (file.size > 5 * 1024 * 1024) { alert(`${file.name} is too large (max 5MB)`); return; }
-                uploadedFiles.push(file);
-                const reader = new FileReader();
-                reader.onload = e => addPreview(e.target.result, uploadedFiles.length - 1);
-                reader.readAsDataURL(file);
+                convertToJpeg(file).then(jpegFile => {
+                    if (uploadedFiles.length >= 10) return;
+                    uploadedFiles.push(jpegFile);
+                    const reader = new FileReader();
+                    reader.onload = e => addPreview(e.target.result, uploadedFiles.length - 1);
+                    reader.readAsDataURL(jpegFile);
+                    updateFileCount();
+                });
             });
-            updateFileCount();
+        }
+
+        // Convert sebarang gambar (PNG/GIF/WebP) kepada JPEG dalam browser.
+        // PDF generator hanya boleh embed JPEG tanpa PHP GD extension di server,
+        // jadi kita pastikan semua upload sampai ke server sebagai JPEG.
+        function convertToJpeg(file) {
+            if (file.type === 'image/jpeg') return Promise.resolve(file);
+            return new Promise(resolve => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    // JPEG tak support transparency — isi background putih dulu
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    canvas.toBlob(blob => {
+                        if (!blob) { resolve(file); return; }
+                        const name = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+                        resolve(new File([blob], name, { type: 'image/jpeg' }));
+                    }, 'image/jpeg', 0.9);
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+                img.src = url;
+            });
         }
 
         function addPreview(src, idx) {
