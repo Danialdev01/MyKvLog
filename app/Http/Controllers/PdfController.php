@@ -128,20 +128,23 @@ class PdfController extends Controller
 
                 // ===== KES 1: Gambar sudah JPEG — boleh guna terus =====
                 // DomPDF boleh proses JPEG tanpa GD extension
-                if ($mimeType === 'image/jpeg' || $mimeType === 'image/jpg') {
+                if (in_array($mimeType, ['image/jpeg', 'image/jpg'], true)) {
                     $ref->image_base64 = 'data:image/jpeg;base64,' . base64_encode($fileContent);
                     continue;
                 }
 
-                // ===== KES 2: Gambar PNG/GIF/lain — perlukan GD untuk convert =====
+                // ===== KES 2: Gambar PNG/GIF/WebP/lain — perlukan GD untuk convert =====
                 if ($gdAda) {
                     // GD ada — convert gambar kepada JPEG dalam memory
                     $ref->image_base64 = $this->convertKeJpegBase64($fileContent, $mimeType);
                 } else {
-                    // GD takde — tidak boleh convert, skip gambar ini
-                    // View akan tunjuk teks "Gambar tidak dapat dipaparkan" sebagai ganti
+                    // GD takde — log untuk ops, dan biar view tunjuk mesej ringkas
+                    \Log::warning('GD extension missing — cannot embed image in PDF', [
+                        'reference_id' => $ref->getKey(),
+                        'mime'         => $mimeType,
+                    ]);
                     $ref->image_base64 = null;
-                    $ref->image_mime = $mimeType; // simpan mime untuk tunjuk mesej berguna
+                    $ref->image_mime   = $mimeType; // simpan mime untuk tunjuk mesej berguna
                 }
             }
         }

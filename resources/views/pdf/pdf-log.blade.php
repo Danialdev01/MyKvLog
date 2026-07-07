@@ -250,11 +250,12 @@
                                     <img src="{{ $ref->image_base64 }}" alt="Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }}">
                                     <div class="gambar-label">Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }}</div>
 
-                                {{-- KES 2: Gambar tidak dapat diproses (PNG tanpa GD) --}}
+                                {{-- KES 2: Gambar tidak dapat diproses (format disokong tapi server tiada GD) --}}
                                 @else
                                     <div class="gambar-warning">
-                                        [Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }} tidak dapat dipaparkan.
-                                        Sila enable PHP GD extension atau upload semula dalam format JPEG.]
+                                        [Gambar {{ $loop->parent->index * 3 + $loop->index + 1 }} tidak dapat dipaparkan
+                                        ({{ $ref->image_mime ?? 'format tidak disokong' }}).
+                                        Hubungi admin untuk enable PHP GD extension.]
                                     </div>
                                 @endif
 
