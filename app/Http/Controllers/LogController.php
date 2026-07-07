@@ -65,7 +65,7 @@ class LogController extends Controller
             $userId = auth()->id();
             foreach ($request->file('images') as $index => $image) {
                 $filename = 'logs/' . $userId . '/' . $log->log_id . '/' . time() . '_' . $index . '.' . $image->getClientOriginalExtension();
-                $path = Storage::disk('s3')->putFileAs('', $image, $filename, 'public');
+                $path = Storage::disk('public')->putFileAs('', $image, $filename);
 
                 Reference::create([
                     'log_id' => $log->log_id,

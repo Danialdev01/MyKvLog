@@ -102,7 +102,7 @@ class PdfController extends Controller
      * PNG pula memerlukan GD.
      *
      * Strategi:
-     * - Baca gambar dari S3 (tempat upload sebenar), fallback ke disk public untuk fail lama
+     * - Baca gambar dari disk public (tempat upload sebenar), fallback ke S3 untuk fail lama
      * - Kalau gambar memang JPEG/JPG → baca terus, convert ke base64 (tak perlu GD)
      * - Kalau gambar PNG/GIF/lain → cuba convert ke JPEG guna GD kalau ada
      * - Kalau gagal → image_base64 = null, image_error simpan sebab untuk view
@@ -163,12 +163,12 @@ class PdfController extends Controller
 
     /**
      * Baca kandungan gambar dari storage.
-     * Upload baru disimpan dalam S3 (lihat LogController::store),
-     * tapi fail lama mungkin masih dalam disk public — cuba kedua-duanya.
+     * Upload baru disimpan dalam disk public (lihat LogController::store),
+     * tapi fail lama mungkin masih dalam S3 — cuba kedua-duanya.
      */
     private function bacaGambar(string $path): ?string
     {
-        foreach (['s3', 'public'] as $disk) {
+        foreach (['public', 's3'] as $disk) {
             try {
                 $content = Storage::disk($disk)->get($path);
                 if ($content !== null && $content !== '') {
