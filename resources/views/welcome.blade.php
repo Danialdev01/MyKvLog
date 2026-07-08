@@ -6,7 +6,7 @@ $year = date('Y');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MyInternLog — Tell. Print. Smile.</title>
+    <title>MyKvLog — Tell. Print. Smile.</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -501,7 +501,7 @@ $year = date('Y');
                     </h1>
 
                     <p class="text-base md:text-lg mb-8" style="color:var(--gray-600); line-height:1.75;">
-                        MyInternLog mendengar apa yang anda lakukan hari ini dan <strong style="color:var(--gray-800);">secara automatik menulis log latihan industri anda</strong> dalam ayat yang sempurna dan profesional — dengan gambar dan rajah termasuk. Selesai dalam beberapa minit.
+                        MyKvLog mendengar apa yang anda lakukan hari ini dan <strong style="color:var(--gray-800);">secara automatik menulis log latihan industri anda</strong> dalam ayat yang sempurna dan profesional — dengan gambar dan rajah termasuk. Selesai dalam beberapa minit.
                     </p>
 
                     <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
@@ -536,7 +536,7 @@ $year = date('Y');
                                 <div class="dot" style="background:#FF5F57;"></div>
                                 <div class="dot" style="background:#FFBD2E;"></div>
                                 <div class="dot" style="background:#28CA41;"></div>
-                                <span class="ml-3 text-xs" style="color:#94A3B8;">MyInternLog — Penjana Log Harian</span>
+                                <span class="ml-3 text-xs" style="color:#94A3B8;">MyKvLog — Penjana Log Harian</span>
                             </div>
                             <div class="p-6">
                                 <div class="mb-5">
@@ -598,7 +598,7 @@ $year = date('Y');
             <div class="grid md:grid-cols-3 gap-6">
                 @php
                 $steps_data = [
-                    ['01','📣','Beritahu MyInternLog','Cuma sebut atau taip apa yang anda buat hari ini dalam bahasa mudah. Tiada risau tatabahasa, tiada format — cuma idea mentah anda.', 'var(--orange)'],
+                    ['01','📣','Beritahu MyKvLog','Cuma sebut atau taip apa yang anda buat hari ini dalam bahasa mudah. Tiada risau tatabahasa, tiada format — cuma idea mentah anda.', 'var(--orange)'],
                     ['02','🤖','AI Menulisnya','AI kami mengembangkan input anda menjadi entri log yang terperinci dan profesional dalam format latihan KV yang betul — serta-merta.', 'var(--gray-600)'],
                     ['03','🖨️','Cetak & Tersenyum','Tambah foto anda, dapat rajah yang dijana secara auto, kompil log mingguan anda, dan tekan Cetak. Selesai. Penyelia impressed.', 'var(--orange)'],
                 ];
@@ -636,7 +636,7 @@ $year = date('Y');
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 features-grid">
                 @php
                 $features = [
-                    ['🧠','Penulis Log AI','Tampal atau sebut hari anda dalam ayat yang pecah. MyInternLog menulis semula secara automatik menjadi bahasa Inggeris yang sempurna dan profesional.'],
+                    ['🧠','Penulis Log AI','Tampal atau sebut hari anda dalam ayat yang pecah. MyKvLog menulis semula secara automatik menjadi bahasa Inggeris yang sempurna dan profesional.'],
                     ['📸','Integrasi Foto','Lampirkan foto tapak anda dan AI meletakkannya di sebelah entri log yang berkaitan.'],
                     ['📊','Rajah Auto','Perihalkan aliran kerja dan получите rajah yang kemas yang dijana secara auto untuk dilampirkan pada log anda. Tiada Visio diperlukan.'],
                     ['📋','Format CIDB/KV','Output sudah diformat pra untuk sepadan dengan struktur buku log latihan KV anda — sedia untuk dihantar.'],
@@ -659,14 +659,14 @@ $year = date('Y');
         <div class="max-w-5xl mx-auto px-4 md:px-6">
             <div class="text-center mb-14 reveal">
                 <div class="section-label mb-3">Perbezaannya</div>
-                <h2 class="syne text-4xl font-extrabold" style="font-weight:800; color: var(--gray-800);">Sebelum & Selepas MyInternLog</h2>
+                <h2 class="syne text-4xl font-extrabold" style="font-weight:800; color: var(--gray-800);">Sebelum & Selepas MyKvLog</h2>
             </div>
 
             <div class="grid md:grid-cols-2 gap-8 compare-grid">
                 <div class="rounded-2xl p-6 compare-card" style="background:rgba(255,107,53,0.05);border:1.5px solid rgba(255,107,53,0.2);">
                     <div class="flex items-center gap-2 mb-5">
                         <span style="font-size:1.3rem;">😰</span>
-                        <span class="syne font-bold text-lg" style="color:var(--orange);font-weight:700;">Without MyInternLog</span>
+                        <span class="syne font-bold text-lg" style="color:var(--orange);font-weight:700;">Without MyKvLog</span>
                     </div>
                     @php
                     $befores = [
@@ -689,7 +689,7 @@ $year = date('Y');
                 <div class="rounded-2xl p-6 compare-card" style="transition-delay:0.15s;background:rgba(255,107,53,0.08);border:1.5px solid rgba(255,107,53,0.3);">
                     <div class="flex items-center gap-2 mb-5">
                         <span style="font-size:1.3rem;">🎉</span>
-                        <span class="syne font-bold text-lg" style="color:var(--orange);font-weight:700;">With MyInternLog</span>
+                        <span class="syne font-bold text-lg" style="color:var(--orange);font-weight:700;">With MyKvLog</span>
                     </div>
                     @php
                     $afters = [
@@ -785,11 +785,18 @@ $year = date('Y');
                 </div>
 
                 <div class="text-xs" style="color:var(--gray-400);">
-                    © {{ $year }} MyInternLog. Dibuat dengan ❤️ untuk pelajar KV di Malaysia.
+                    © {{ $year }} MyKvLog. Dibuat dengan ❤️ untuk pelajar KV di Malaysia.
                 </div>
             </div>
         </div>
     </footer>
+
+    @php
+        // Kalau ada ralat pengesahan, tentukan borang mana yang cuba dihantar:
+        // kehadiran old('name') bermakna cubaan DAFTAR, jika tidak cubaan DAFTAR MASUK.
+        $authWasRegister = old('name') !== null;
+        $authHasErrors = $errors->any();
+    @endphp
 
     <div id="authModal" class="modal-overlay">
         <div class="modal-box relative">
@@ -808,9 +815,14 @@ $year = date('Y');
 
                 <form method="POST" action="{{ route('login.post') }}">
                     @csrf
+                    @if($authHasErrors && !$authWasRegister)
+                        <div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:10px 14px;margin-bottom:16px;color:#DC2626;font-size:0.82rem;font-weight:600;text-align:left;">
+                            ⚠️ {{ $errors->first() }}
+                        </div>
+                    @endif
                     <div class="form-group">
                         <label>Alamat Emel</label>
-                        <input type="email" name="email" placeholder="anda@contoh.com" required />
+                        <input type="email" name="email" placeholder="anda@contoh.com" required value="{{ $authWasRegister ? '' : old('email') }}" />
                     </div>
                     <div class="form-group">
                         <label>Kata Laluan</label>
@@ -837,6 +849,11 @@ $year = date('Y');
 
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
+                    @if($authHasErrors && $authWasRegister)
+                        <div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:10px 14px;margin-bottom:16px;color:#DC2626;font-size:0.82rem;font-weight:600;text-align:left;">
+                            ⚠️ {{ $errors->first() }}
+                        </div>
+                    @endif
                     <div class="form-group">
                         <label>Nama Penuh</label>
                         <input type="text" name="name" placeholder="Nama penuh anda" required value="{{ old('name') }}" />
@@ -899,6 +916,17 @@ $year = date('Y');
         modal.addEventListener('click', function(e) {
             if (e.target === modal) closeModal();
         });
+
+        // Buka semula modal auth secara automatik selepas cubaan gagal (ralat pengesahan),
+        // dan papar borang yang betul (daftar vs daftar masuk).
+        @if($authHasErrors)
+            @if($authWasRegister)
+                showSignup();
+            @else
+                showLogin();
+            @endif
+            openModal();
+        @endif
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeModal();
